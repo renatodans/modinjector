@@ -2,7 +2,7 @@
 
 namespace ModInjector.Dependency
 {
-    public interface IIocManager : IIocRegister, IDisposable
+    public interface IIocManager : IDisposable
     {
     }
 }

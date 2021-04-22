@@ -1,17 +1,17 @@
 ﻿using ModInjector.Attributes;
 using ModInjector.Modules;
-using Sample.Core;
+using Sample.Infrastructure;
 
 namespace Sample.Api
 {
-    [DependsOn(
-       typeof(CoreModule)
+    [DependsOn(        
+       typeof(InfrastructureModule)
    )]
     public class ApiModule : InjectorModule
     {
-        public override void Initialize()
+        public override void PreInitialize()
         {
-            IocManager.RegisterAssemblyByConvention(typeof(ApiModule).Assembly);
+            
         }
     }
 }

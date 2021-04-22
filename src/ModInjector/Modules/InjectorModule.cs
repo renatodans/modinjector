@@ -11,8 +11,6 @@ namespace ModInjector.Modules
     {
         protected internal IIocManager IocManager { get; internal set; }
 
-        
-
         public static bool IsInjectorModule(Type type)
         {
             var typeInfo = type.GetTypeInfo();
@@ -22,6 +20,8 @@ namespace ModInjector.Modules
                 !typeInfo.IsGenericType &&
                 typeof(InjectorModule).IsAssignableFrom(type);
         }
+
+
 
         public virtual void PreInitialize()
         {
@@ -33,6 +33,33 @@ namespace ModInjector.Modules
 
         public virtual void PostInitialize()
         {
+        }
+
+
+
+        public static List<Type> FindDependedModuleTypesRecursivelyIncludingGivenModule(Type moduleType)
+        {
+            var list = new List<Type>();
+            AddModuleAndDependenciesRecursively(list, moduleType);
+
+            return list;
+        }
+
+        private static void AddModuleAndDependenciesRecursively(List<Type> modules, Type module)
+        {
+            if (!IsInjectorModule(module))
+                throw new Exception("This type is not an ModInjector module: " + module.AssemblyQualifiedName);
+
+            if (modules.Contains(module))
+                return;
+
+            modules.Add(module);
+
+            var dependedModules = FindDependedModuleTypes(module);
+            foreach (var dependedModule in dependedModules)
+            {
+                AddModuleAndDependenciesRecursively(modules, dependedModule);
+            }
         }
 
         public static List<Type> FindDependedModuleTypes(Type moduleType)
@@ -55,33 +82,6 @@ namespace ModInjector.Modules
             }
 
             return list;
-        }
-
-        public static List<Type> FindDependedModuleTypesRecursivelyIncludingGivenModule(Type moduleType)
-        {
-            var list = new List<Type>();
-            AddModuleAndDependenciesRecursively(list, moduleType);
-
-            //list.AddIfNotContains(typeof(KernelModule));
-
-            return list;
-        }
-
-        private static void AddModuleAndDependenciesRecursively(List<Type> modules, Type module)
-        {
-            if (!IsInjectorModule(module))
-                throw new Exception("This type is not an ModInjector module: " + module.AssemblyQualifiedName);
-
-            if (modules.Contains(module))
-                return;
-
-            modules.Add(module);
-
-            var dependedModules = FindDependedModuleTypes(module);
-            foreach (var dependedModule in dependedModules)
-            {
-                AddModuleAndDependenciesRecursively(modules, dependedModule);
-            }
         }
     }
 }
